@@ -1,14 +1,11 @@
 # This is a basic docker image for use in the clinic
-FROM python:3.12-slim
 
-# Switch to root to update and install tools
+FROM jupyter/minimal-notebook:python-3.11
+
+# Swith to root to update and install python dev tools
 USER root
-RUN apt-get update && apt-get install -y curl
-
-# Install uv
-ARG uv=/root/.local/bin/uv
-ADD https://astral.sh/uv/install.sh /install.sh
-RUN chmod +x /install.sh && /install.sh && rm /install.sh
+RUN apt update
+RUN apt install -y python3-pip python3-dev
 
 # Create working directory
 WORKDIR /project
@@ -22,9 +19,9 @@ COPY --chown=$NB_UID:$NB_GID requirements.txt .
 USER $NB_UID
 
 # Install Python 3 packages
-RUN /root/.local/bin/uv pip install --no-cache-dir -r requirements.txt --system
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install project as an editable package
-RUN /root/.local/bin/uv pip install -e . --system
+# install project as an editable package
+RUN pip install -e .
 
 CMD ["/bin/bash"]
